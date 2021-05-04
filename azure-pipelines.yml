@@ -10,8 +10,23 @@ pool:
   vmImage: ubuntu-latest
 
 variables:
+  DOT_NET_SKIP_FIRST_TIME_EXPERIENCE: true
   buildConfiguration: 'Release'
 
 steps:
-- script: dotnet build --configuration $(buildConfiguration)
-  displayName: 'dotnet build $(buildConfiguration)'
+- task: UseDotNet@2
+  inputs:
+    packageType: 'sdk'
+    version: '5.x'
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    zipAfterPublish: false
+    modifyOutputPath: false
+    arguments: --output $(Build.ArtifactStagingDirectory)
+- task: PublishPipelineArtifact@1
+  inputs:
+    targetPath: '$(Build.ArtifactStagingDirectory)'
+    artifact: 'QuanLyKhachSan'
+    publishLocation: 'pipeline'
